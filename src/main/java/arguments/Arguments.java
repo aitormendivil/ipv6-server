@@ -1,3 +1,5 @@
+package arguments;
+
 import com.github.jankroken.commandline.annotations.*;
 
 /**

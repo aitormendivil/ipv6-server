@@ -1,8 +1,11 @@
+import arguments.Arguments;
 import com.github.jankroken.commandline.CommandLineParser;
 import com.github.jankroken.commandline.OptionStyle;
 import com.github.jankroken.commandline.domain.InvalidCommandLineException;
 import com.github.jankroken.commandline.domain.InvalidOptionConfigurationException;
 import com.github.jankroken.commandline.domain.UnrecognizedSwitchException;
+import configuration.ConfigReader;
+import configuration.Configuration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
@@ -25,9 +28,14 @@ public class s_server {
             LOGGER.info("Arguments: -f " + arguments.getConfFilename() + " -p " + arguments.getPort() + " -m "
                 + arguments.getMdir() + " -o " + arguments.getMport());
 
+            LOGGER.info("Reading Configuration...");
 
-            LOGGER.info("Starting server... ");
+            Configuration configuration = new Configuration();
 
+            ConfigReader configReader = new ConfigReader();
+            configReader.getConfiguration(arguments.getConfFilename(), configuration);
+
+            // LOGGER.info("Starting server... ");
 
         } catch (InvalidCommandLineException clException) {
             clException.printStackTrace();
