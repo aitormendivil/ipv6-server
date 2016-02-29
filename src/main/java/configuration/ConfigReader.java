@@ -18,6 +18,8 @@ public class ConfigReader {
 
                 ConfigurationLine configurationLine = parseLine(line);
 
+                System.out.println(configurationLine.toString());
+
                 configuration.addConfigurationLine(configurationLine);
 
             }
