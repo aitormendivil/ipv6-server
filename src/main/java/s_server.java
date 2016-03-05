@@ -6,17 +6,25 @@ import com.github.jankroken.commandline.domain.InvalidOptionConfigurationExcepti
 import com.github.jankroken.commandline.domain.UnrecognizedSwitchException;
 import configuration.ConfigReader;
 import configuration.Configuration;
+import server.Server;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
 
 /**
  * Created by Aitor on 27/2/16.
  */
 public class s_server {
 
-    private static final Logger LOGGER = Logger.getLogger( s_server.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger(s_server.class.getName());
 
     public static void main(String[] args) {
 
@@ -28,6 +36,8 @@ public class s_server {
             LOGGER.info("Arguments: -f " + arguments.getConfFilename() + " -p " + arguments.getPort() + " -m "
                 + arguments.getMdir() + " -o " + arguments.getMport());
 
+            //TODO: validate arguments
+
             LOGGER.info("Reading Configuration...");
 
             Configuration configuration = new Configuration();
@@ -35,7 +45,29 @@ public class s_server {
             ConfigReader configReader = new ConfigReader();
             configReader.getConfiguration(arguments.getConfFilename(), configuration);
 
+
+
+
+            Server server = new Server(InetAddress.getByName(arguments.getMdir()), Integer.parseInt(arguments.getMport()), configuration);
+
+            List<String> listaMensajes = server.sendAnnounce();
+
+            for (String mensaje: listaMensajes
+                 ) {
+                System.out.println(mensaje);
+                System.out.println("-----------");
+            }
+
+
             // LOGGER.info("Starting server... ");
+
+/*
+
+            InetAddress MDIR = InetAddress.getByName(MCAST_ADDR);
+            Thread server = server();
+            server.start();
+*/
+
 
         } catch (InvalidCommandLineException clException) {
             clException.printStackTrace();
@@ -49,8 +81,14 @@ public class s_server {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+
     }
+
 
 }
