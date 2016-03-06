@@ -1,2 +1,2 @@
-# ipv6-server
-An IPv6 server
+# ipv6-announceServer
+An IPv6 announceServer

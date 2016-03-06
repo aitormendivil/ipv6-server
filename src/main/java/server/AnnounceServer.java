@@ -5,7 +5,6 @@ import configuration.ConfigurationLine;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
@@ -16,9 +15,9 @@ import java.util.logging.Logger;
 /**
  * Created by Aitor on 5/3/16.
  */
-public class Server /*implements Runnable*/ {
+public class AnnounceServer implements Runnable {
 
-    private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AnnounceServer.class.getName());
 
     Configuration configuration;
 
@@ -26,7 +25,7 @@ public class Server /*implements Runnable*/ {
     InetAddress MDir;
     int port;
 
-    public Server(InetAddress MDir, int port, Configuration configuration) throws IOException {
+    public AnnounceServer(InetAddress MDir, int port, Configuration configuration) throws IOException {
         this.MDir = MDir;
         this.port = port;
         this.configuration = configuration;
@@ -35,26 +34,25 @@ public class Server /*implements Runnable*/ {
     }
 
 
-/*    public void run() {
-        DatagramSocket serverSocket = null;
+    public void run() {
         try {
-            serverSocket = new DatagramSocket();
             try {
                 while (true) {
-                    byte[] sendData = new byte[256];
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, GROUP, PORT);
-                    serverSocket.send(sendPacket);
-                    ThreadUtilities.sleep(1000);
+                    boolean error = sendAnnounce();
+                    if(error){
+                        LOGGER.severe("Error sending announce...");
+                    }
+                    Thread.currentThread().sleep(1000);
                 }
             } catch (Exception e) {
-                LOGGER.error(null, e);
+                LOGGER.severe(e.getMessage());
             }
         } catch (Exception e) {
-            LOGGER.error(null, e);
+            LOGGER.severe(e.getMessage());
         }
-    }*/
+    }
 
-    public List<String> sendAnnounce(){
+    public boolean sendAnnounce(){
 
         int MaxLinesPerPacket = 10;
 
@@ -93,8 +91,13 @@ public class Server /*implements Runnable*/ {
 
         }
 
-        return messageList;
+        boolean error = false;
+        for (String message :
+                messageList) {
+            error = this.send(message);
+        }
 
+        return error;
     }
 
     private static List<List<ConfigurationLine>> splitByGroupAsList(List<ConfigurationLine> list, int elementsInGroup) {
@@ -122,15 +125,15 @@ public class Server /*implements Runnable*/ {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, this.MDir, this.port);
             try {
                 this.multicastSocket.send(sendPacket);
-                return true;
+                return false;
             }
             catch (Exception ex){
                 LOGGER.severe("Impossible send message through socket. Exception: " + ex.getMessage());
-                return false;
+                return true;
             }
         }
         else
-            return false;
+            return true;
 
     }
 

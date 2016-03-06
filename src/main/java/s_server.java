@@ -6,18 +6,14 @@ import com.github.jankroken.commandline.domain.InvalidOptionConfigurationExcepti
 import com.github.jankroken.commandline.domain.UnrecognizedSwitchException;
 import configuration.ConfigReader;
 import configuration.Configuration;
-import server.Server;
+import server.AnnounceServer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.StreamHandler;
 
 /**
  * Created by Aitor on 27/2/16.
@@ -48,24 +44,26 @@ public class s_server {
 
 
 
-            Server server = new Server(InetAddress.getByName(arguments.getMdir()), Integer.parseInt(arguments.getMport()), configuration);
+            AnnounceServer announceServer = new AnnounceServer(InetAddress.getByName(arguments.getMdir()), Integer.parseInt(arguments.getMport()), configuration);
 
-            List<String> listaMensajes = server.sendAnnounce();
+            new Thread(announceServer).start();
 
-            for (String mensaje: listaMensajes
+
+
+/*            for (String mensaje: listaMensajes
                  ) {
                 System.out.println(mensaje);
                 System.out.println("-----------");
-            }
+            }*/
 
 
-            // LOGGER.info("Starting server... ");
+            // LOGGER.info("Starting announceServer... ");
 
 /*
 
             InetAddress MDIR = InetAddress.getByName(MCAST_ADDR);
-            Thread server = server();
-            server.start();
+            Thread announceServer = announceServer();
+            announceServer.start();
 */
 
 
