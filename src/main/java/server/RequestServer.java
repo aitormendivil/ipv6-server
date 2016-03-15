@@ -3,6 +3,8 @@ package server;
 import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
 import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 import configuration.Configuration;
+import server.exceptions.MalformedClientRequestException;
+import server.exceptions.ScriptNotFoundException;
 import server.utils.ClientRequest;
 
 import java.io.BufferedReader;
@@ -20,13 +22,13 @@ public class RequestServer implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(RequestServer.class.getName());
 
-    Configuration configuration;
+    private Configuration configuration;
 
-    Socket socket;
+    private Socket socket;
 
-    BufferedReader br;
+    private BufferedReader br;
 
-    PrintWriter out;
+    private PrintWriter out;
 
     public RequestServer(Socket socket, Configuration configuration) throws IOException {
 
@@ -53,23 +55,34 @@ public class RequestServer implements Runnable {
                 if (line != null) {
                     waiting = false;
                     clientRequest = new ClientRequest(this.socket, line, this.configuration);
+                    out.print("REQ OK");
                 }
+            }
+            catch (MalformedClientRequestException me){
+                out.print("REQ FAIL " + me.getMessage());
+            }
+            catch (ScriptNotFoundException se){
+                out.print("REQ FAIL " + se.getMessage());
             }
             catch (java.lang.Exception e){
                 LOGGER.severe("Error handling the client Request");
             }
+            finally {
+
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    LOGGER.severe("Impossible to close socket");
+                    e.printStackTrace();
+                }
+            }
         }
 
         if (!waiting) {
-
-            this.streamingThread = new StreamingThread(this, request);
-
-            this.socketThread.start();
-            this.streamingThread.start();
+            StreamServer streamServer = new StreamServer(clientRequest);
+            new Thread(streamServer).start();
         }
 
     }
-
-    private void readline()
 
 }

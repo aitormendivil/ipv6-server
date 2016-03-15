@@ -19,11 +19,12 @@ public class AnnounceServer implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(AnnounceServer.class.getName());
 
-    Configuration configuration;
+    private Configuration configuration;
 
-    MulticastSocket multicastSocket;
-    InetAddress MDir;
-    int port;
+    private MulticastSocket multicastSocket;
+    private InetAddress MDir;
+    private int port;
+
 
     public AnnounceServer(InetAddress MDir, int port, Configuration configuration) throws IOException {
         this.MDir = MDir;

@@ -1,6 +1,7 @@
 package configuration;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Aitor on 28/2/16.
@@ -40,6 +41,22 @@ public class Configuration {
             return configurationLines.get(index);
         else
             return null;
+    }
+
+    public ConfigurationLine getConfigurationLineById(int id){
+
+        if(configurationLines != null){
+            Iterator<ConfigurationLine> configurationLineIterator = configurationLines.iterator();
+            while (configurationLineIterator.hasNext()){
+                ConfigurationLine configurationLine = configurationLineIterator.next();
+                if(configurationLine.getId() == id)
+                    return configurationLine;
+            }
+            return null;
+        }
+        else
+            return null;
+
     }
 
 }
