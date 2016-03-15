@@ -28,7 +28,8 @@ public class ClientServer implements Runnable {
         try {
             ServerSocket serverSocket = new ServerSocket(this.port);
             while (true) {
-                new RequestServer(serverSocket.accept(), this.configuration);
+                RequestServer requestServer = new RequestServer(serverSocket.accept(), this.configuration);
+                new Thread(requestServer).start();
             }
         } catch (IOException ex) {
             LOGGER.severe(ex.getMessage());
