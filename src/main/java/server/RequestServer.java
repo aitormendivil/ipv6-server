@@ -1,29 +1,75 @@
 package server;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
+import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 import configuration.Configuration;
+import server.utils.ClientRequest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 /**
  * Created by Aitor on 6/3/16.
  */
 public class RequestServer implements Runnable {
 
+    private static final Logger LOGGER = Logger.getLogger(RequestServer.class.getName());
 
     Configuration configuration;
 
     Socket socket;
 
-    public RequestServer(Socket socket, Configuration configuration) {
+    BufferedReader br;
+
+    PrintWriter out;
+
+    public RequestServer(Socket socket, Configuration configuration) throws IOException {
 
         this.configuration = configuration;
         this.socket = socket;
+
+        br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+
+        out = new PrintWriter(this.socket.getOutputStream(), true);
 
     }
 
     public void run() {
 
+        ClientRequest clientRequest = null;
+        String line = null;
+
+        boolean waiting = true;
+
+        while (waiting) {
+            try {
+                line = this.br.readLine();
+
+                if (line != null) {
+                    waiting = false;
+                    clientRequest = new ClientRequest(this.socket, line, this.configuration);
+                }
+            }
+            catch (java.lang.Exception e){
+                LOGGER.severe("Error handling the client Request");
+            }
+        }
+
+        if (!waiting) {
+
+            this.streamingThread = new StreamingThread(this, request);
+
+            this.socketThread.start();
+            this.streamingThread.start();
+        }
+
     }
+
+    private void readline()
 
 }

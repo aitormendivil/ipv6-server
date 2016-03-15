@@ -65,11 +65,13 @@ public class s_server {
 
             new Thread(announceServer).start();
 
+            LOGGER.info("Starting announces...");
+
             ClientServer clientServer = new ClientServer(Integer.parseInt(arguments.getPort()), configuration);
 
             new Thread(clientServer).start();
 
-
+            LOGGER.info("Starting client server...");
 
         } catch (InvalidCommandLineException clException) {
             clException.printStackTrace();
@@ -88,7 +90,6 @@ public class s_server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
     }
 
