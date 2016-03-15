@@ -79,8 +79,13 @@ public class RequestServer implements Runnable {
         }
 
         if (!waiting) {
-            StreamServer streamServer = new StreamServer(clientRequest);
-            new Thread(streamServer).start();
+            try {
+                StreamServer streamServer = new StreamServer(clientRequest);
+                new Thread(streamServer).start();
+            }
+            catch (java.lang.Exception e){
+                LOGGER.severe("Impossible start streaming" + e.getMessage());
+            }
         }
 
     }

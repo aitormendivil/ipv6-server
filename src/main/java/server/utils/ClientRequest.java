@@ -72,4 +72,20 @@ public class ClientRequest {
 
     }
 
+    public int getRequestId() {
+        return requestId;
+    }
+
+    public int getRequestClientPort() {
+        return requestClientPort;
+    }
+
+    public String getRequestClientAddress() {
+        return requestClientAddress;
+    }
+
+    public ConfigurationLine getRequestConfigurationLine() {
+        return requestConfigurationLine;
+    }
+
 }
