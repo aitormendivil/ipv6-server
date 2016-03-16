@@ -1,7 +1,5 @@
 package server;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
-import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 import configuration.Configuration;
 import server.exceptions.MalformedClientRequestException;
 import server.exceptions.ScriptNotFoundException;
@@ -11,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
 
