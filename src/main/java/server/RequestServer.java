@@ -50,11 +50,16 @@ public class RequestServer implements Runnable {
         while (waiting) {
             try {
                 line = this.br.readLine();
-                LOGGER.info("Received message from client: " + line);
                 if (line != null) {
+                    LOGGER.info("Received message from client: " + line);
                     waiting = false;
                     clientRequest = new ClientRequest(this.socket, line, this.configuration);
                     out.println("REQ OK");
+                }
+                else{
+                    LOGGER.info("Connection closed from client");
+                    waiting = false;
+                    socket.close();
                 }
             }
             catch (MalformedClientRequestException me){

@@ -12,16 +12,11 @@ public class ConfigReader {
         try {
             FileInputStream fstream = new FileInputStream(file);
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-            String line = null;
+            String line;
 
             while ((line = br.readLine()) != null) {
-
                 ConfigurationLine configurationLine = parseLine(line);
-
-                System.out.println(configurationLine.toString());
-
                 configuration.addConfigurationLine(configurationLine);
-
             }
 
         } catch (FileNotFoundException e) {
