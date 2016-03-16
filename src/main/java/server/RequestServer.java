@@ -40,6 +40,8 @@ public class RequestServer implements Runnable {
 
     public void run() {
 
+        LOGGER.info("Starting request server...");
+
         ClientRequest clientRequest = null;
         String line = null;
 
@@ -48,36 +50,30 @@ public class RequestServer implements Runnable {
         while (waiting) {
             try {
                 line = this.br.readLine();
-
+                LOGGER.info("Received message from client: " + line);
                 if (line != null) {
                     waiting = false;
                     clientRequest = new ClientRequest(this.socket, line, this.configuration);
-                    out.print("REQ OK");
+                    out.println("REQ OK");
                 }
             }
             catch (MalformedClientRequestException me){
-                out.print("REQ FAIL " + me.getMessage());
+                waiting = true;
+                out.println("REQ FAIL " + me.getMessage());
             }
             catch (ScriptNotFoundException se){
-                out.print("REQ FAIL " + se.getMessage());
+                waiting = true;
+                out.println("REQ FAIL " + se.getMessage());
             }
-            catch (java.lang.Exception e){
+            catch (Exception e){
+                waiting = true;
                 LOGGER.severe("Error handling the client Request");
-            }
-            finally {
-
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    LOGGER.severe("Impossible to close socket");
-                    e.printStackTrace();
-                }
             }
         }
 
-        if (!waiting) {
+        if (clientRequest != null) {
             try {
-                StreamServer streamServer = new StreamServer(clientRequest);
+                StreamSender streamServer = new StreamSender(clientRequest);
                 new Thread(streamServer).start();
             }
             catch (java.lang.Exception e){

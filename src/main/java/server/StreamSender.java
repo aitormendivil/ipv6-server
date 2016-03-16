@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * Created by Aitor on 15/3/16.
  */
-public class StreamServer implements Runnable {
+public class StreamSender implements Runnable {
 
 
     private ClientRequest clientRequest;
@@ -19,7 +19,7 @@ public class StreamServer implements Runnable {
     private Process runningScript;
 
 
-    public StreamServer(ClientRequest clientRequest) {
+    public StreamSender(ClientRequest clientRequest) {
 
         this.clientRequest = clientRequest;
         this.configurationLine = clientRequest.getRequestConfigurationLine();

@@ -3,9 +3,8 @@ package server;
 import configuration.Configuration;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.logging.Logger;
 
 /**
@@ -28,8 +27,15 @@ public class ClientServer implements Runnable {
         try {
             ServerSocket serverSocket = new ServerSocket(this.port);
             while (true) {
-                RequestServer requestServer = new RequestServer(serverSocket.accept(), this.configuration);
-                new Thread(requestServer).start();
+                try {
+                    Socket s = serverSocket.accept();
+                    RequestServer requestServer = new RequestServer(s, this.configuration);
+                    new Thread(requestServer).start();
+                }
+                catch (Exception e){
+                    serverSocket.close();
+                    LOGGER.severe(e.getMessage());
+                }
             }
         } catch (IOException ex) {
             LOGGER.severe(ex.getMessage());
