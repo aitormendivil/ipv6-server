@@ -5,7 +5,13 @@ import server.exceptions.ScriptVideoFileNotFoundException;
 import server.exceptions.StreamingScriptNotFoundException;
 import server.utils.ClientRequest;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by Aitor on 15/3/16.
@@ -15,21 +21,24 @@ public class StreamSender implements Runnable {
 
     private ClientRequest clientRequest;
     private ConfigurationLine configurationLine;
+    private String command;
 
     private Process runningScript;
 
 
-    public StreamSender(ClientRequest clientRequest) {
+    public StreamSender(ClientRequest clientRequest)
+            throws StreamingScriptNotFoundException, IOException, ScriptVideoFileNotFoundException {
 
         this.clientRequest = clientRequest;
         this.configurationLine = clientRequest.getRequestConfigurationLine();
+        this.command = this.generateCommand(this.configurationLine);
 
     }
 
     public void run() {
 
         try {
-            this.runningScript = Runtime.getRuntime().exec(generateCommmand(this.configurationLine));
+            this.runningScript = Runtime.getRuntime().exec(this.command);
             this.runningScript.waitFor();
         }
         catch (Exception e){
@@ -37,37 +46,37 @@ public class StreamSender implements Runnable {
         }
     }
 
-    private String generateCommmand(ConfigurationLine configurationLine) throws ScriptVideoFileNotFoundException, StreamingScriptNotFoundException {
+    private String generateCommand(ConfigurationLine configurationLine)
+            throws ScriptVideoFileNotFoundException, StreamingScriptNotFoundException, IOException {
 
         try {
             File f = new File(configurationLine.getScript());
 
             if (!f.exists()) {
-                throw new ScriptVideoFileNotFoundException();
+                throw new ScriptVideoFileNotFoundException("Script video not found exception");
             }
         } catch (Exception e) {
-            throw new ScriptVideoFileNotFoundException();
+            throw new ScriptVideoFileNotFoundException("Script video not found exception");
         }
 
-        try {
-            File f = new File("/scripts/stream_send.bash");
+        InputStream in = getClass().getResourceAsStream("/scripts/stream_send.bash");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-            if (!f.exists()) {
-                throw new ScriptVideoFileNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new StreamingScriptNotFoundException();
+        File temp = File.createTempFile("stream_send", ".bash");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+
+        String line = "";
+        while((line = reader.readLine()) != null){
+          bw.write(line);
         }
 
-        String pattern = System.getProperty("os.name").toLowerCase().contains("win") ? "%s %s %s %s" : "bash %s %s %s %s";
-        File stremScriptFile = new File("/scripts/stream_send.bash");
+        bw.close();
 
-        return String.format(
-                pattern,
-                stremScriptFile.getAbsolutePath(),
-                clientRequest.getRequestClientAddress(),
-                clientRequest.getRequestClientPort(),
-                this.configurationLine.getScript()
+        String command = "bash %s %s %s %s";
+        File streamScriptFile = new File(temp.getAbsolutePath());
+
+        return String.format(command, streamScriptFile.getAbsolutePath(), clientRequest.getRequestClientAddress(),
+                clientRequest.getRequestClientPort(), this.configurationLine.getScript()
         );
     }
 

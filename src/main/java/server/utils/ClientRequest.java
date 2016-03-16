@@ -47,7 +47,7 @@ public class ClientRequest {
                 String[] requestLinePieces = requestLine.split(" ");
                 this.requestId = Integer.parseInt(requestLinePieces[1]);
                 this.requestClientPort = Integer.parseInt(requestLinePieces[2]);
-                String requestClientAddress =  requestLinePieces.length == 4 ?
+                this.requestClientAddress =  requestLinePieces.length == 4 ?
                         requestLinePieces[3] : this.socket.getRemoteSocketAddress().toString();;
 
             } catch (Exception ex){
@@ -71,7 +71,6 @@ public class ClientRequest {
             return true;
         else
             return false;
-
     }
 
     public int getRequestId() {

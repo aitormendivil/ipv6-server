@@ -54,7 +54,6 @@ public class RequestServer implements Runnable {
                     LOGGER.info("Received message from client: " + line);
                     waiting = false;
                     clientRequest = new ClientRequest(this.socket, line, this.configuration);
-                    out.println("REQ OK");
                 }
                 else{
                     LOGGER.info("Connection closed from client");
@@ -79,10 +78,13 @@ public class RequestServer implements Runnable {
         if (clientRequest != null) {
             try {
                 StreamSender streamServer = new StreamSender(clientRequest);
+                LOGGER.info("Starting streaming...");
                 new Thread(streamServer).start();
+                out.println("REQ OK");
             }
-            catch (java.lang.Exception e){
+            catch (Exception e){
                 LOGGER.severe("Impossible start streaming" + e.getMessage());
+                out.println("REQ FAIL " + e.getMessage());
             }
         }
 

@@ -26,7 +26,7 @@ public class s_server {
 
     public static void main(String[] args) throws Exception {
 
-        LOGGER.setLevel(Level.ALL);
+        LOGGER.setLevel(Level.INFO);
 
         try {
             Arguments arguments = CommandLineParser.parse(Arguments.class, args, OptionStyle.SIMPLE);
