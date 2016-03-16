@@ -1,7 +1,5 @@
 package server;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage;
-import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 import configuration.Configuration;
 import server.exceptions.MalformedClientRequestException;
 import server.exceptions.ScriptNotFoundException;
@@ -11,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
 
@@ -43,6 +40,8 @@ public class RequestServer implements Runnable {
 
     public void run() {
 
+        LOGGER.info("Starting request server...");
+
         ClientRequest clientRequest = null;
         String line = null;
 
@@ -51,40 +50,41 @@ public class RequestServer implements Runnable {
         while (waiting) {
             try {
                 line = this.br.readLine();
-
                 if (line != null) {
+                    LOGGER.info("Received message from client: " + line);
                     waiting = false;
                     clientRequest = new ClientRequest(this.socket, line, this.configuration);
-                    out.print("REQ OK");
+                }
+                else{
+                    LOGGER.info("Connection closed from client");
+                    waiting = false;
+                    socket.close();
                 }
             }
             catch (MalformedClientRequestException me){
-                out.print("REQ FAIL " + me.getMessage());
+                waiting = true;
+                out.println("REQ FAIL " + me.getMessage());
             }
             catch (ScriptNotFoundException se){
-                out.print("REQ FAIL " + se.getMessage());
+                waiting = true;
+                out.println("REQ FAIL " + se.getMessage());
             }
-            catch (java.lang.Exception e){
+            catch (Exception e){
+                waiting = true;
                 LOGGER.severe("Error handling the client Request");
-            }
-            finally {
-
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    LOGGER.severe("Impossible to close socket");
-                    e.printStackTrace();
-                }
             }
         }
 
-        if (!waiting) {
+        if (clientRequest != null) {
             try {
-                StreamServer streamServer = new StreamServer(clientRequest);
+                StreamSender streamServer = new StreamSender(clientRequest);
+                LOGGER.info("Starting streaming...");
                 new Thread(streamServer).start();
+                out.println("REQ OK");
             }
-            catch (java.lang.Exception e){
+            catch (Exception e){
                 LOGGER.severe("Impossible start streaming" + e.getMessage());
+                out.println("REQ FAIL " + e.getMessage());
             }
         }
 

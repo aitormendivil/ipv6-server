@@ -36,14 +36,20 @@ public class AnnounceServer implements Runnable {
 
 
     public void run() {
+        int timeToSleep = 1000;
         try {
             try {
                 while (true) {
                     boolean error = sendAnnounce();
                     if(error){
                         LOGGER.severe("Error sending announce...");
+                        if(timeToSleep < 60000)
+                            timeToSleep = timeToSleep + 2000;
                     }
-                    Thread.currentThread().sleep(1000);
+                    else{
+                        timeToSleep = 1000;
+                    }
+                    Thread.currentThread().sleep(timeToSleep);
                 }
             } catch (Exception e) {
                 LOGGER.severe(e.getMessage());
@@ -62,7 +68,6 @@ public class AnnounceServer implements Runnable {
         String startMessage = "SSER " + this.port + "\n";
         String moreMessage = "MORE";
         String endMessage = "END";
-
 
         List<ConfigurationLine> configurationLines = configuration.getConfigurationLines();
 

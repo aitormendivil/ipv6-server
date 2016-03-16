@@ -36,7 +36,7 @@ public class ClientRequest {
         this.parseRequestLine(requestLine);
 
         if(!this.getConfigurationLine())
-            throw new ScriptNotFoundException("Script id not found");
+            throw new ScriptNotFoundException("Requested script not found");
     }
 
     //REQ id puertocliente [direccioncliente]
@@ -47,16 +47,18 @@ public class ClientRequest {
                 String[] requestLinePieces = requestLine.split(" ");
                 this.requestId = Integer.parseInt(requestLinePieces[1]);
                 this.requestClientPort = Integer.parseInt(requestLinePieces[2]);
-                String requestClientAddress =  requestLinePieces.length == 4 ?
+                this.requestClientAddress =  requestLinePieces.length == 4 ?
                         requestLinePieces[3] : this.socket.getRemoteSocketAddress().toString();;
 
             } catch (Exception ex){
-                throw new MalformedClientRequestException();
+                LOGGER.info("Impossible to understand the client request");
+                throw new MalformedClientRequestException("Impossible to understand the client request.\n Request "
+                        + "format:  REQ id port [address]");
             }
         }
         else
         {
-            LOGGER.severe("");
+            LOGGER.info("The client request does not start by REQ");
             throw new MalformedClientRequestException("The Client request does not start by REQ");
         }
     }
@@ -69,7 +71,6 @@ public class ClientRequest {
             return true;
         else
             return false;
-
     }
 
     public int getRequestId() {
