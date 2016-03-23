@@ -61,7 +61,10 @@ public class s_server {
             ConfigReader configReader = new ConfigReader();
             configReader.getConfiguration(arguments.getConfFilename(), configuration);
 
-            AnnounceServer announceServer = new AnnounceServer(InetAddress.getByName(arguments.getMdir()), Integer.parseInt(arguments.getMport()), configuration);
+            AnnounceServer announceServer = new AnnounceServer(InetAddress.getByName(arguments.getMdir()),
+                    Integer.parseInt(arguments.getMport()),
+                    Integer.parseInt(arguments.getPort()),
+                    configuration);
 
             new Thread(announceServer).start();
 

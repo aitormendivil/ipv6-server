@@ -24,12 +24,14 @@ public class AnnounceServer implements Runnable {
     private MulticastSocket multicastSocket;
     private InetAddress MDir;
     private int port;
+    private int clientServerPort;
 
 
-    public AnnounceServer(InetAddress MDir, int port, Configuration configuration) throws IOException {
+    public AnnounceServer(InetAddress MDir, int port, int clientServerPort, Configuration configuration) throws IOException {
         this.MDir = MDir;
         this.port = port;
         this.configuration = configuration;
+        this.clientServerPort = clientServerPort;
 
         this.multicastSocket = new MulticastSocket(port);
     }
@@ -65,7 +67,7 @@ public class AnnounceServer implements Runnable {
 
         List<String> messageList = new ArrayList<String>();
 
-        String startMessage = "SSER " + this.port + "\n";
+        String startMessage = "SSER " + this.clientServerPort + "\n";
         String moreMessage = "MORE";
         String endMessage = "END";
 
